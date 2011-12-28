@@ -386,6 +386,12 @@ Function FullUrl(serverUrl, sourceUrl, key) As String
 	finalUrl = ""
 	if left(key, 4) = "http" then
 		return key
+    else if left(key, 4) = "plex" then
+        url_start = Instr(1, key, "url=") + 4
+        url_end = Instr(url_start, key, "&")
+        url = Mid(key, url_start, url_end - url_start)
+        o = CreateObject("roUrlTransfer")
+        return o.Unescape(url)
 	else
 		keyTokens = CreateObject("roArray", 2, true)
 		if key <> Invalid then
@@ -404,10 +410,14 @@ Function FullUrl(serverUrl, sourceUrl, key) As String
 	    	finalUrl = serverUrl
     	else if keyTokens[0] = "" AND serverUrl = "" then
         	finalUrl = sourceUrlTokens[0]
-		else if left(keyTokens[0], 1) = "/" then
+		else if keyTokens[0] <> invalid AND left(keyTokens[0], 1) = "/" then
 			finalUrl = serverUrl+keyTokens[0]
 		else
-			finalUrl = sourceUrlTokens[0]+"/"+keyTokens[0]
+            if keyTokens[0] <> invalid then
+			    finalUrl = sourceUrlTokens[0]+"/"+keyTokens[0]
+            else
+                finalUrl = sourceUrlTokens[0]+"/"
+            endif
 		endif
 		if keyTokens.Count() = 2 OR sourceUrlTokens.Count() =2 then
 	    	finalUrl = finalUrl + "?"
@@ -492,6 +502,9 @@ Function TranscodingVideoUrl(serverUrl As String, videoUrl As String, sourceUrl 
 	end if
 	print "REG READ LEVEL"+ RegRead("level", "preferences")
 	baseUrl = "/video/:/transcode/segmented/start.m3u8?identifier=com.plexapp.plugins.library&ratingKey="+ratingKey+"&key="+HttpEncode(fullKey)+"&offset=0"
+    if left(videoUrl, 4) = "plex" then
+        baseUrl = baseUrl + "&webkit=1"
+    end if
 	currentQuality = RegRead("quality", "preferences")
     if currentQuality = "Auto" then
     	myurl = baseUrl+"&minQuality=4&maxQuality=8"
@@ -512,7 +525,18 @@ End Function
 Function Capabilities() As String
 	protocols = "protocols=http-live-streaming,http-mp4-streaming,http-mp4-video,http-mp4-video-720p,http-streaming-video,http-streaming-video-720p"
 	print "REG READ LEVEL"+ RegRead("level", "preferences")
-	decoders = "videoDecoders=h264{profile:high&resolution:1080&level:"+ RegRead("level", "preferences") + "};audioDecoders=aac"
+	'do checks to see if 5.1 is supported, else use stereo
+	device = CreateObject("roDeviceInfo")
+	audio = "aac"
+	version = device.GetVersion()
+    	major = Mid(version, 3, 1)
+    	minor = Mid(version, 5, 2)
+    	build = Mid(version, 8, 5)
+	print "Device Version:" + major +"." + minor +" build "+build
+	if device.HasFeature("5.1_surround_sound") and major.ToInt() >= 4 then
+		audio="ac3"
+	endif 
+	decoders = "videoDecoders=h264{profile:high&resolution:1080&level:"+ RegRead("level", "preferences") + "};audioDecoders="+audio
 	return protocols+";"+decoders
 End Function
 
