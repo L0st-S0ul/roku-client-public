@@ -33,10 +33,14 @@ Function ConstructRokuVideoMetadata(server, sourceUrl, xmlContainer, videoItemXm
 	
 	video.ShortDescriptionLine1 = videoItemXml@title
 	' for performance reasons we need to make sure the description is not huge. seems to cause memory recall issues
-	if len(videoItemXml@summary) > 180 then
-		video.Description = left(videoItemXml@summary, 180)+"..."
-	else
-		video.Description = videoItemXml@summary
+	if videoItemXml@summary <> invalid then
+        if len(videoItemXml@summary) > 180 then
+		    video.Description = left(videoItemXml@summary, 180)+"..."
+	    else
+		    video.Description = videoItemXml@summary
+        end if
+    else
+        video.Description = "(No summary available)"
 	end if
 	video.ReleaseDate = videoItemXml@originallyAvailableAt
 	video.viewOffset = videoItemXml@viewOffset
