@@ -13,85 +13,72 @@ End Function
 
 Function showGridScreen(grid, content) As Integer
 	if validateParam(grid, "roGridScreen", "showGridScreen") = false return -1
-    if validateParam(content, "roAssociativeArray", "showGridScreen") = false return -1
+    if validateParam(content, "roAssociativeArray", "showGridScreen") = false return -1			
+
+	totalTimer = CreateObject("roTimespan")
+	totalTimer.Mark()
 	
-	print "Show grid screen for key ";content.key
+	performanceTimer = CreateObject("roTimespan")
 	
-	retrieving = CreateObject("roOneLineDialog")
-	retrieving.SetTitle("Retrieving ...")
-	retrieving.ShowBusyAnimation()
-	retrieving.Show()
-		
-    server = content.server
+	server = content.server
 	contentKey = content.key
 	currentTitle = content.Title
 	
+	performanceTimer.Mark()
 	queryResponse = server.GetQueryResponse(content.sourceUrl, contentKey)
+	Print "SERVER TIMER -- Initial Server Query took: " + itostr(performanceTimer.TotalMilliseconds())
 	
+	performanceTimer.Mark()
 	names = server.GetListNames(queryResponse)
+	Print "PARSER TIMER -- GetListNames took: " + itostr(performanceTimer.TotalMilliseconds())
+	
+	performanceTimer.Mark()
 	keys = server.GetListKeys(queryResponse)
+	Print "PARSER TIMER -- GetListKeys took: " + itostr(performanceTimer.TotalMilliseconds())
 	
+	performanceTimer.Mark()
     grid.SetupLists(names.Count()) 
+	Print "GRID TIMER -- SetupLists took: " + itostr(performanceTimer.TotalMilliseconds())
+	
+	performanceTimer.Mark()
 	grid.SetListNames(names)
-        
-    contentArray = []
-    rowCount = 0
-	altCount = 0
+	Print "GRID TIMER -- SetListNames took: " + itostr(performanceTimer.TotalMilliseconds())
 	
-	gridShown = false
+	' Show the grid...
+	grid.Show()
 	
-    for each key in keys
-		print "Page key:"+key
-
-		response = server.GetQueryResponse(queryResponse.sourceUrl, key)
-		'response = server.GetPaginatedQueryResponse(queryResponse.sourceUrl, key, 0, 50)
-		'printXML(response.xml, 1)
-		
-		contentList = server.GetContent(response)
-		
-		grid.setContentList(rowCount, contentList)
-					
-		contentArray[rowCount] = []
-		
-		itemCount = 0
-		for each item in contentList
-			contentArray[rowCount][itemCount] = item
-			itemCount = itemCount + 1
-		next
-		
-		' make sure any section without content is not shown
-		if itemCount = 0 then
-			grid.setListVisible(rowCount, false)
-		end if
-		
-		rowCount = rowCount + 1
-		
-		' after the second row let's show the grid as a test...
-		if rowCount = 2 then
-			grid.show()
-			retrieving.close()
-			gridShown = true
-		end if
-    next
+	' How many rows we have
+	keyCount = keys.Count()
 	
-	' now if there were less than 2 rows then let's just show the grid...
-	if gridShown = false then
-		grid.show()
-		retrieving.close()
-	end if
+	' Our content array holder
+	contentArray = []
+	
+	rowCount = 0	
+	' Load the first grid row...
+	performanceTimer.Mark()
+	rowCount = loadNextRow(grid, server, keys[rowCount], queryResponse.sourceUrl, contentArray, rowCount)
+	Print "ROW LOADER -- First row took: " + itostr(performanceTimer.TotalMilliseconds())
+	' Load the second grid row...
+	performanceTimer.Mark()
+	rowCount = loadNextRow(grid, server, keys[rowCount], queryResponse.sourceUrl, contentArray, rowCount)	
+	Print "ROW LOADER -- Second row took: " + itostr(performanceTimer.TotalMilliseconds())
+	
+	Print "TOTAL INITIAL GRID LOAD TIME: " + itostr(totalTimer.TotalMilliseconds())
 	
 	while true
-        msg = wait(0, m.port)
+        msg = wait(1, m.port)
+		
         if type(msg) = "roGridScreenEvent" then
             if msg.isListItemSelected() then
-                row = msg.GetIndex()
+				print "Selected msg: ";msg.GetData()
+				row = msg.GetIndex()
 				if row < rowCount then
 					selection = msg.getData()
 					
 					contentSelected = contentArray[row][selection]
 					contentType = contentSelected.ContentType
 					
-					print "Content type in grid screen:"+contentType
+					'print "Content type in grid screen:"+contentType
 					
 					if contentType = "movie" OR contentType = "episode" then
 						displaySpringboardScreen(contentSelected.title, contentArray[row], selection)
@@ -107,8 +94,47 @@ Function showGridScreen(grid, content) As Integer
                 return -1
             end if
         end If
+		
+		' check to see if there is more data to load and do one at a time...
+		if( rowCount < keyCount )
+			performanceTimer.Mark()
+			rowCount = loadNextRow(grid, server, keys[rowCount], queryResponse.sourceUrl, contentArray, rowCount)
+			Print "PROGRESSIVE ROW LOADER -- row took: " + itostr(performanceTimer.TotalMilliseconds())
+		end if
     end while
 	return 0
+End Function
+
+Function loadNextRow(myGrid, myServer, myKey, mySourceUrl, myContentArray, myRowCount) as Integer
+	performanceTimer = CreateObject("roTimespan")
+	performanceTimer.Mark()
+	
+	response = myServer.GetQueryResponse(mySourceUrl, myKey)
+	'printXML(response.xml, 1)
+	Print "PAGE CONTENT TIMER -- Getting Row Content took: " + itostr(performanceTimer.TotalMilliseconds())
+
+	performanceTimer.Mark()
+	contentList = myServer.GetContent(response)
+	Print "PAGE CONTENT TIMER -- Parsing Server Content took: " + itostr(performanceTimer.TotalMilliseconds())
+			
+	myContentArray[myRowCount] = []
+	
+	performanceTimer.Mark()
+	itemCount = 0
+	for each item in contentList
+		myContentArray[myRowCount][itemCount] = item
+		itemCount = itemCount + 1
+	next
+
+	if itemCount > 0 then
+		myGrid.setContentList(myRowCount, myContentArray[myRowCount])
+	else
+		myGrid.setListVisible(myRowCount, false)
+	end if
+			
+	myRowCount = myRowCount + 1
+	
+	return myRowCount
 End Function
 
 Function showNextGridScreen(currentTitle, selected As Object) As Dynamic
