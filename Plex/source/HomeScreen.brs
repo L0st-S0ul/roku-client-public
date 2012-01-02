@@ -33,7 +33,7 @@ Function showHomeScreen(screen, servers) As Integer
     		if displayServerName then
     			section.Title = section.Title + " ("+server.name+")"
     			section.ShortDescriptionLine1 = section.ShortDescriptionLine1 + " ("+server.name+")"
-    		endif
+    		end if
     		sectionList.Push(section)
     	end for
 	end for
@@ -67,7 +67,7 @@ Function showHomeScreen(screen, servers) As Integer
             else if msg.isScreenClosed() then
                 return -1
             end if
-        end If
+        end if
     end while
 
     return 0
@@ -91,7 +91,7 @@ Function displaySection(section As Object, homeScreen As Object) As Dynamic
     	'showPosterScreen(screen, section)
 		grid = preShowGridScreen()
     	showGridScreen(grid, section)
-    endif
+    end if
     return 0
 End Function
 

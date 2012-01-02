@@ -46,7 +46,7 @@ Function showSearchGridScreen(server, query) As Integer
             else if msg.isScreenClosed() then
                 return -1
             end if
-        end If
+        end if
     end while
     return 0
 End Function

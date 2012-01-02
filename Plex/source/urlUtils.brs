@@ -96,7 +96,7 @@ Function http_prepare_url_for_query() As String
         m.FirstParam = false
     else
         url = url + "&"
-    endif
+    end if
     m.Http.SetUrl(url)
     return url
 End Function
@@ -153,8 +153,8 @@ Function http_get_to_string_with_retry() as String
                 timeout% = 2 * timeout%
             else
                 print "roUrlTransfer::AsyncGetToString(): unknown event"
-            endif
-        endif
+            end if
+        end if
 
         num_retries% = num_retries% - 1
     end while
@@ -181,8 +181,8 @@ Function http_get_to_string_with_timeout(seconds as Integer) as String
             m.Http.AsyncCancel()
         else
             Dbg("AsyncGetToString unknown event", event)
-        endif
-    endif
+        end if
+    end if
 
     return str
 End Function
@@ -209,8 +209,8 @@ Function http_post_from_string_with_timeout(val As String, seconds as Integer) a
         else
 			print "3"
             Dbg("AsyncPostFromString unknown event", event)
-        endif
-    endif
+        end if
+    end if
 
     return str
 End Function

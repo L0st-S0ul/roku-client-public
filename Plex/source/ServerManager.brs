@@ -125,8 +125,8 @@ Function Discover() As Object
     	    		end if
     	    	end if
 	    	end for
-		endif
-	endif
+		end if
+	end if
   next
   return list
 End Function
@@ -203,12 +203,12 @@ Function ScanNetwork(ip) As Object
           print serversResponse
           if inStr(0, serversResponse, "address=") OR inStr(0, serversResponse, "host=")
             exit while
-          endif
-       endif
+          end if
+       end if
        if responseCount >= xferArray.Count() then
        		exit while
-       endif
-    endif
+       end if
+    end if
   end while
   Dim response[2]
   response.Push(serversResponse)

@@ -63,7 +63,7 @@ Function playVideo(server, metadata, mediaData, seekValue)
             	print "Message data -> ";msg.GetInfo()
             else
                 print "MediaPlayer::playVideo::VideoScreenEvent::Uncaptured event: "; msg.GetType(); " msg: "; msg.GetMessage()
-            endif
+            end if
         end if
     end while
 End Function
@@ -96,7 +96,7 @@ Function playPluginVideo(server, metadata)
                 server.StopVideo()
             else
                 print "Unknown event: "; msg.GetType(); " msg: "; msg.GetMessage()
-            endif
+            end if
         end if
     end while
 End Function
@@ -108,7 +108,7 @@ Function playAlbum(server, metadata)
     
     while true
         msg = wait(0, audioplayer.GetMessagePort())
-        print "Message:";type(msg)
+        'print "Message:";type(msg)
         if type(msg) = "roAudioPlayerEvent"
             print "roAudioPlayerEvent: "; msg.getmessage() 
             if msg.isRequestSucceeded() then 
@@ -121,7 +121,7 @@ Function playAlbum(server, metadata)
                 print "play failed: "; msg.GetMessage()
             else
                 print "Unknown event: "; msg.GetType(); " msg: "; msg.GetMessage()
-            endif
+            end if
         end if
     end while
 End Function

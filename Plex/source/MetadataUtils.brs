@@ -26,7 +26,7 @@ Function ImageSizes(viewGroup, contentType) As Object
 		hdWidth = "300"
 		hdHeight = "300"
 	
-	endif
+	end if
 	sizes = CreateObject("roAssociativeArray")
 	sizes.sdWidth = sdWidth
 	sizes.sdHeight = sdHeight

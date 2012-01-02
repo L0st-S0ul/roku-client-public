@@ -46,7 +46,7 @@ Function search(query) As Object
 		if directoryItem@type = "show" then
 			directory = newDirectoryMetadata(m, xmlResult.sourceUrl, xmlResult.xml, directoryItem)
 			shows.Push(directory)
-		endif
+		end if
 	next
 	for each videoItem in xmlResult.xml.Video
 		video = newVideoMetadata(m, xmlResult.sourceUrl, xmlResult.xml, videoItem)
@@ -93,7 +93,7 @@ Function updateSubtitleStreamSelection(partId As String, subtitleStreamId As Str
 	subtitle = invalid
 	if subtitleStreamId <> invalid then
 		subtitle = subtitleStreamId
-	endif
+	end if
 	commandUrl = "/library/parts/"+partId+"?subtitleStreamID="+subtitle
 	m.ExecutePostCommand(commandUrl)
 End Function
@@ -140,9 +140,9 @@ Function homePageContent() As Object
 	content = CreateObject("roArray", librarySections.Count() + 1, true)
 	for each section in librarySections
 		'* Exclude music for now until transcode to mp3 is available
-		if section.type = "movie" OR section.type = "show" then
+		if section.type = "movie" OR section.type = "show" then 'OR section.type = "artist" then
 			content.Push(section)
-		endif
+		end if
 	next
 	
 	if not(RegExists("ChannelsAndSearch", "preferences")) then
@@ -203,10 +203,10 @@ Function paginatedXmlContent(sourceUrl, key, start, size) As Object
 			xml=CreateObject("roXMLElement")
 			if not xml.Parse(response) then
 				print "Can't parse feed:";response
-			endif
+			end if
 			xmlResult.xml = xml
 			xmlResult.sourceUrl = queryUrl
-	endif
+	end if
 	return xmlResult
 End Function
 
@@ -239,11 +239,11 @@ Function xmlContent(sourceUrl, key) As Object
 		xml=CreateObject("roXMLElement")
 		if not xml.Parse(response) then
 			print "Can't parse feed:";response
-		endif
+		end if
 			
 		xmlResult.xml = xml
 		xmlResult.sourceUrl = queryUrl
-	endif
+	end if
 	return xmlResult
 End Function
 
@@ -255,14 +255,14 @@ Function listNames(parsedXml) As Object
 		'content.Push("Audio")
 		'content.Push("Photo")
 	else
-		sectionViewGroup = parsedXml.xml@viewGroup
-		if sectionViewGroup = "secondary" then
+		'sectionViewGroup = parsedXml.xml@viewGroup
+		'if sectionViewGroup = "secondary" then
 			sections = m.GetContent(parsedXml)
 			for each section in sections
 				content.Push(section.title)
 			next
-		endif
-	endif
+		'end if
+	end if
 	return content
 End Function
 
@@ -274,14 +274,14 @@ Function listKeys(parsedXml) As Object
 		'content.Push("/music")
 		'content.Push("/photos")
 	else
-		sectionViewGroup = parsedXml.xml@viewGroup
-		if sectionViewGroup = "secondary" then
+		'sectionViewGroup = parsedXml.xml@viewGroup
+		'if sectionViewGroup = "secondary" then
 			sections = m.GetContent(parsedXml)
 			for each section in sections
 				content.Push(section.key)
 			next
-		endif
-	endif
+		'end if
+	end if
 	return content
 End Function
 		
@@ -291,7 +291,7 @@ Function directoryContent(parsedXml) As Object
 		if directoryItem@search = invalid then
 			directory = newDirectoryMetadata(m, parsedXml.sourceUrl, parsedXml.xml, directoryItem)
 			content.Push(directory)
-		endif
+		end if
 	next
 	for each videoItem in parsedXml.xml.Video
 		video = newVideoMetadata(m, parsedXml.sourceUrl, parsedXml.xml, videoItem)
@@ -310,7 +310,7 @@ Function IndirectMediaXml(server, originalKey) As Object
 	if not xml.Parse(response) then
 			print "Can't parse feed:";response
 			return originalKey
-	endif
+	end if
     return xml
 End Function
 		
@@ -398,13 +398,13 @@ Function FullUrl(serverUrl, sourceUrl, key) As String
 			keyTokens = strTokenize(key, "?")
 		else
 			keyTokens.Push("")
-		endif
+		end if
 		sourceUrlTokens = CreateObject("roArray", 2, true)
 		if sourceUrl <> Invalid then
 			sourceUrlTokens = strTokenize(sourceUrl, "?")
 		else
 			sourceUrlTokens.Push("")
-		endif
+		end if
 	
 		if keyTokens[0] = "" AND sourceUrlTokens[0] = "" then
 	    	finalUrl = serverUrl
@@ -417,21 +417,21 @@ Function FullUrl(serverUrl, sourceUrl, key) As String
 			    finalUrl = sourceUrlTokens[0]+"/"+keyTokens[0]
             else
                 finalUrl = sourceUrlTokens[0]+"/"
-            endif
-		endif
+            end if
+		end if
 		if keyTokens.Count() = 2 OR sourceUrlTokens.Count() =2 then
 	    	finalUrl = finalUrl + "?"
 	    	if keyTokens.Count() = 2 then
 	    		finalUrl = finalUrl + keyTokens[1]
 	    		if sourceUrlTokens.Count() = 2 then
 	    			finalUrl = finalUrl + "&"
-	    		endif
-	    	endif
+	    		end if
+	    	end if
 	    	if sourceUrlTokens.Count() = 2 then
 	    		finalUrl = finalUrl + sourceUrlTokens[1]
-	    	endif
-		endif
-    endif
+	    	end if
+		end if
+    end if
     'print "FinalURL:";finalUrl
 	return finalUrl
 End Function
@@ -467,7 +467,7 @@ Function ConstructVideoClip(serverUrl as String, videoUrl as String, sourceUrl A
 	quality = "SD"
 	if deviceInfo.GetDisplayType() = "HDTV" then
 		quality = "HD"
-	endif
+	end if
 	print "Setting stream quality:";quality
 	videoclip = CreateObject("roAssociativeArray")
     videoclip.StreamBitrates = [0]
@@ -535,7 +535,7 @@ Function Capabilities() As String
 	print "Device Version:" + major +"." + minor +" build "+build
 	if device.HasFeature("5.1_surround_sound") and major.ToInt() >= 4 then
 		audio="ac3"
-	endif 
+	end if 
 	decoders = "videoDecoders=h264{profile:high&resolution:1080&level:"+ RegRead("level", "preferences") + "};audioDecoders="+audio
 	return protocols+";"+decoders
 End Function

@@ -30,7 +30,7 @@ Function showSpringboardScreen(screen, contentList, index) As Integer
 				startTime = 0
 				if buttonCommand = "resume" then
 					startTime = int(val(metaDataArray.metadata.viewOffset))
-				endif
+				end if
         		playVideo(server, metaDataArray.metadata, metaDataArray.media, startTime)
         		'* Refresh play data after playing
         		metaDataArray = Populate(screen, contentList, index)
@@ -40,23 +40,23 @@ Function showSpringboardScreen(screen, contentList, index) As Integer
         	else if buttonCommand = "subtitleStreamSelection" then
         		SelectSubtitleStream(server, metaDataArray.media)
         		metaDataArray = Populate(screen, contentList, index)
-        	endif
+        	end if
         else if msg.isRemoteKeyPressed() then
         	'* index=4 -> left ; index=5 -> right
 			if msg.getIndex() = 4 then
 				index = index - 1
 				if index < 0 then
 					index = contentList.Count()-1
-				endif
+				end if
 				metaDataArray = Populate(screen, contentList, index)
 			else if msg.getIndex() = 5 then
 				index = index + 1
 				if index > contentList.Count()-1 then
 					index = 0
-				endif
+				end if
 				metaDataArray = Populate(screen, contentList, index)
-			endif
-        endif
+			end if
+        end if
     end while
 
     return 0
@@ -81,7 +81,7 @@ Function Populate(screen, contentList, index) As Object
 	metaDataArray.buttonCommands = AddButtons(screen, metadata, metadata.preferredMediaItem)
     if metadata <> invalid and metadata.SDPosterURL <> invalid and metadata.HDPosterURL <> invalid then
 	    screen.PrefetchPoster(metadata.SDPosterURL, metadata.HDPosterURL)
-    endif
+    end if
 	screen.Show()
 	retrieving.Close()
 	return metaDataArray
@@ -100,12 +100,12 @@ Function SelectSubtitleStream(server, media)
 	for each Stream in mediaPart.streams
 		if Stream.streamType = "3" AND Stream.selected <> invalid then
 			selected = true
-		endif
+		end if
 	next
 	noSelectionTitle = "No Subtitles"
 	if not selected then
 		noSelectionTitle = "> "+noSelectionTitle
-	endif
+	end if
 	
         buttonCommands = CreateObject("roAssociativeArray")
         buttonCount = 0
@@ -117,19 +117,19 @@ Function SelectSubtitleStream(server, media)
                         buttonTitle = "Unknown"
                         if Stream.Language <> Invalid then
                                 buttonTitle = Stream.Language
-                        endif
+                        end if
                         if Stream.Language <> Invalid AND Stream.Codec <> Invalid AND Stream.Codec = "srt" then
                                 buttonTitle = Stream.Language + " (*)"
                         else if Stream.Codec <> Invalid AND Stream.Codec = "srt" then
                                 buttonTitle = "Unknown (*)"
-                        endif
+                        end if
                         if Stream.selected <> invalid then
                                 buttonTitle = "> " + buttonTitle
-                        endif
+                        end if
                         dialog.AddButton(buttonCount, buttonTitle)
                         buttonCommands[str(buttonCount)+"_id"] = Stream.Id
                         buttonCount = buttonCount + 1   
-                endif
+                end if
         next
         dialog.Show()
 	while true 
@@ -166,15 +166,15 @@ Function SelectAudioStream(server, media)
                         buttonTitle = "Unkwown"
                         if Stream.Language <> Invalid then
                                 buttonTitle = Stream.Language
-                        endif
+                        end if
                         subtitle = invalid
                         if Stream.Codec <> invalid then
                                 if Stream.Codec = "dca" then
                                         subtitle = "DTS"
                                 else 
                                         subtitle = ucase(Stream.Codec)
-                                endif
-                        endif
+                                end if
+                        end if
                         if Stream.Channels <> invalid then
                                 if Stream.Channels = "2" then
                                         subtitle = subtitle + " Stereo"
@@ -182,18 +182,18 @@ Function SelectAudioStream(server, media)
                                         subtitle = subtitle + " 5.1"
                                 else if Stream.Channels = "8" then
                                         subtitle = subtitle + " 7.1"
-                                endif
-                        endif
+                                end if
+                        end if
                         if subtitle <> invalid then
                                 buttonTitle = buttonTitle + " ("+subtitle+")"
-                        endif
+                        end if
                         if Stream.selected <> invalid then
                                 buttonTitle = "> " + buttonTitle
-                        endif
+                        end if
                         dialog.AddButton(buttonCount, buttonTitle)
                         buttonCommands[str(buttonCount)+"_id"] = Stream.Id
                         buttonCount = buttonCount + 1   
-                endif
+                end if
         next
         dialog.Show()
 	while true 
@@ -224,7 +224,7 @@ Function AddButtons(screen, metadata, media) As Object
 		screen.AddButton(buttonCount, resumeTitle)
 		buttonCommands[str(buttonCount)] = "resume"
 		buttonCount = buttonCount + 1
-	endif
+	end if
 	screen.AddButton(buttonCount, "Play")
 	buttonCommands[str(buttonCount)] = "play"
 	buttonCount = buttonCount + 1
@@ -237,7 +237,7 @@ Function AddButtons(screen, metadata, media) As Object
 			audioStreams.Push(Stream)
 		else if Stream.streamType = "3" then
 			subtitleStreams.Push(Stream)
-		endif
+		end if
 	next
 	print "Found audio streams:";audioStreams.Count()
 	print "Found subtitle streams:";subtitleStreams.Count()
@@ -245,12 +245,12 @@ Function AddButtons(screen, metadata, media) As Object
 		screen.AddButton(buttonCount, "Select audio stream")
 		buttonCommands[str(buttonCount)] = "audioStreamSelection"
 		buttonCount = buttonCount + 1
-	endif
+	end if
 	if subtitleStreams.Count() > 0 then
 		screen.AddButton(buttonCount, "Select subtitles")
 		buttonCommands[str(buttonCount)] = "subtitleStreamSelection"
 		buttonCount = buttonCount + 1
-	endif
+	end if
 	return buttonCommands
 End Function
 
@@ -262,15 +262,15 @@ Function TimeDisplay(intervalInSeconds) As String
 	hoursStr = hours.tostr()
 	if hoursStr.len() = 1 then
 		hoursStr = "0"+hoursStr
-	endif
+	end if
 	minsStr = minutes.tostr()
 	if minsStr.len() = 1 then
 		minsStr = "0"+minsStr
-	endif
+	end if
 	secsStr = seconds.tostr()
 	if secsStr.len() = 1 then
 		secsStr = "0"+secsStr
-	endif
+	end if
 	return hoursStr+":"+minsStr+":"+secsStr
 End Function
 

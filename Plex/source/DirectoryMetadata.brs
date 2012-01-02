@@ -17,21 +17,39 @@ Function ConstructDirectoryMetadata(server, sourceUrl, xmlContainer, directoryIt
 		directory.ContentType = "series"
 	else if directory.ContentType = invalid then
 		directory.ContentType = "appClip"
-	endif
+	end if
 	directory.Key = directoryItemXml@key
 	directory.Title = directoryItemXml@title
-	directory.Description = directoryItemXml@summary
+	if directoryItemXml@summary <> invalid then
+        if len(directoryItemXml@summary) > 180 then
+		    directory.Description = left(directoryItemXml@summary, 180)+"..."
+	    else
+		    directory.Description = directoryItemXml@summary
+        end if
+    else
+        directory.Description = "(No summary available)"
+	end if
+	
 	if directory.Title = invalid then
 		directory.Title = directoryItemXml@name
-	endif
+	end if
 	directory.ShortDescriptionLine1 = directoryItemXml@title
 	if directory.ShortDescriptionLine1 = invalid then
 		directory.ShortDescriptionLine1 = directoryItemXml@name
-	endif
-	directory.ShortDescriptionLine2 = directoryItemXml@summary
+	end if
+	if directoryItemXml@summary <> invalid then
+        if len(directoryItemXml@summary) > 180 then
+		    directory.ShortDescriptionLine2 = left(directoryItemXml@summary, 180)+"..."
+	    else
+		    directory.ShortDescriptionLine2 = directoryItemXml@summary
+        end if
+    else
+        'directory.ShortDescriptionLine2 = "(No summary available)"
+	end if
+	
 	'if xmlResponse.xml@viewGroup = "Details" OR xmlResponse.xml@viewGroup = "InfoList" then
 	'	video.ShortDescriptionLine2 = videoItem@summary
-	'endif
+	'end if
 	
 	sizes = ImageSizes(xmlContainer@viewGroup, directory.ContentType)
 	thumb = directoryItemXml@thumb
@@ -42,11 +60,11 @@ Function ConstructDirectoryMetadata(server, sourceUrl, xmlContainer, directoryIt
 		art = directoryItemXml@art
 		if art = invalid then
 			art = xmlContainer@art
-		endif
+		end if
 		if art <> invalid then
 			directory.SDPosterURL = server.TranscodedImage(sourceUrl, art, sizes.sdWidth, sizes.sdHeight)
 			directory.HDPosterURL = server.TranscodedImage(sourceUrl, art, sizes.hdWidth, sizes.hdHeight)
-		endif
-	endif
+		end if
+	end if
 	return directory
 End Function

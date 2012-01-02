@@ -52,12 +52,12 @@ Function showPosterScreen(screen, content) As Integer
 		contentType = invalid
 		if contentList.Count() > 0 then
 			contentType = contentList[0].ContentType
-		endif
+		end if
     	screen.SetContentList(contentList)
 		viewGroup = queryResponse.xml@viewGroup
     	SetListStyle(screen, viewGroup, contentType)
     	screen.SetFocusedListItem(0)
-    endif
+    end if
     screen.Show()
 
     while true
@@ -76,7 +76,7 @@ Function showPosterScreen(screen, content) As Integer
 					contentList = contentListArray[0]
 					totalSize = contentListArray[1] 
 					screen.SetFocusedListItem(middlePoint)
-                endif
+                end if
             else if msg.isListItemSelected() then
                 selected = contentList[msg.GetIndex()]
                 contentType = selected.ContentType
@@ -91,7 +91,7 @@ Function showPosterScreen(screen, content) As Integer
         			ChannelInfo(selected)
                 else
                 	showNextPosterScreen(currentTitle, selected)
-                endif
+                end if
                 
         '* Scrolling pagination allowing navigation of large libraries.
         '* 
@@ -119,14 +119,14 @@ Function showPosterScreen(screen, content) As Integer
 						contentListArray = PopulateContentList(server, screen, queryResponse.sourceUrl, contentKey, paginationStart, totalSize)
 					    contentList = contentListArray[0]
 					    totalSize = contentListArray[1] 
-					endif
-				endif
+					end if
+				end if
             else if msg.isListItemInfo() then
             	print "list item info"
             else if msg.isScreenClosed() then
                 return -1
             end if
-        end If
+        end if
     end while
     return 0
 End Function
@@ -181,7 +181,7 @@ Function PaginationStartPoint(size, currentStartPoint, difference) As Integer
 		newStartPoint = size + newStartPoint
 	else if newStartPoint = size then
 		newStartPoint = 0
-	endif
+	end if
 	return newStartPoint
 End Function
 
@@ -212,18 +212,18 @@ Function PopulateContentList(server, screen, sourceUrl, contentKey, start, total
     	viewGroup = subSectionResponse.xml@viewGroup
         if viewGroup = invalid
             viewGroup = "apps"
-        endif
+        end if
     	newTotalSize = subSectionResponse.xml@totalSize
         if newTotalSize = invalid
     	    newTotalSize = subSectionResponse.xml@size
-        endif
+        end if
 		contentList = server.GetContent(subSectionResponse)
-	endif
+	end if
 	
 	contentType = invalid
 	if contentList.Count() > 0 then
 		contentType = contentList[0].ContentType
-	endif
+	end if
     screen.SetContentList(contentList)
     SetListStyle(screen, viewGroup, contentType)
     
@@ -231,7 +231,7 @@ Function PopulateContentList(server, screen, sourceUrl, contentKey, start, total
     contentArray.Push(contentList)
     if newTotalSize <> invalid then
     	contentArray.Push(strtoi(newTotalSize))
-    endif
+    end if
     return contentArray
 End Function
 
@@ -248,7 +248,7 @@ Function SetListStyle(screen, viewGroup, contentType)
     	displayMode = "scale-to-fit"
     else if viewGroup = "movie" OR viewGroup = "show" OR viewGroup = "season" OR viewGroup = "episode" then
     	listStyle = "arced-portrait"
-    endif
+    end if
     screen.SetListStyle(listStyle)
     screen.SetListDisplayMode(displayMode)
 End Function

@@ -2,11 +2,13 @@
 '* Initial attempt at a grid screen. 
 '*
 Function preShowGridScreen() As Object
+	Print "##################################### CREATE GRID SCREEN #####################################"
 	m.port = CreateObject("roMessagePort")
     grid = CreateObject("roGridScreen")
 	grid.SetMessagePort(m.port)
 		
     grid.SetDisplayMode("photo-fit")
+	grid.SetUpBehaviorAtTopRow("exit")
 	
     return grid
 End Function
@@ -49,6 +51,7 @@ Function showGridScreen(grid, content) As Integer
 	
 	' How many rows we have
 	keyCount = keys.Count()
+	'print "Keys for loader: ";keys
 	
 	' Our content array holder
 	contentArray = []
@@ -59,9 +62,9 @@ Function showGridScreen(grid, content) As Integer
 	rowCount = loadNextRow(grid, server, keys[rowCount], queryResponse.sourceUrl, contentArray, rowCount)
 	Print "ROW LOADER -- First row took: " + itostr(performanceTimer.TotalMilliseconds())
 	' Load the second grid row...
-	performanceTimer.Mark()
-	rowCount = loadNextRow(grid, server, keys[rowCount], queryResponse.sourceUrl, contentArray, rowCount)	
-	Print "ROW LOADER -- Second row took: " + itostr(performanceTimer.TotalMilliseconds())
+	'performanceTimer.Mark()
+	'rowCount = loadNextRow(grid, server, keys[rowCount], queryResponse.sourceUrl, contentArray, rowCount)	
+	'Print "ROW LOADER -- Second row took: " + itostr(performanceTimer.TotalMilliseconds())
 	
 	Print "TOTAL INITIAL GRID LOAD TIME: " + itostr(totalTimer.TotalMilliseconds())
 	
@@ -77,9 +80,7 @@ Function showGridScreen(grid, content) As Integer
 					
 					contentSelected = contentArray[row][selection]
 					contentType = contentSelected.ContentType
-					
-					'print "Content type in grid screen:"+contentType
-					
+
 					if contentType = "movie" OR contentType = "episode" then
 						displaySpringboardScreen(contentSelected.title, contentArray[row], selection)
 					else if contentType = "clip" then
@@ -87,13 +88,18 @@ Function showGridScreen(grid, content) As Integer
 					else if contentSelected.viewGroup <> invalid AND contentSelected.viewGroup = "Store:Info" then
 						ChannelInfo(contentSelected)
 					else
+						'showNextGridScreen(contentSelected.title, contentSelected)
 						showNextPosterScreen(contentSelected.title, contentSelected)
 					end if
-				end If
+				end if
             else if msg.isScreenClosed() then
+				Print "prepare to close gridscreen: " + currentTitle
+				Print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ CLOSE GRID SCREEN ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
                 return -1
             end if
-        end If
+		else
+			'print "Unknown event: ";msg
+        end if
 		
 		' check to see if there is more data to load and do one at a time...
 		if( rowCount < keyCount )
@@ -109,6 +115,7 @@ Function loadNextRow(myGrid, myServer, myKey, mySourceUrl, myContentArray, myRow
 	performanceTimer = CreateObject("roTimespan")
 	performanceTimer.Mark()
 	
+	'print "myKey: ";myKey
 	response = myServer.GetQueryResponse(mySourceUrl, myKey)
 	'printXML(response.xml, 1)
 	Print "PAGE CONTENT TIMER -- Getting Row Content took: " + itostr(performanceTimer.TotalMilliseconds())

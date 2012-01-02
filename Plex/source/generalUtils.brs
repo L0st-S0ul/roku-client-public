@@ -296,12 +296,12 @@ Function strReplace(basestr As String, oldsub As String, newsub As String) As St
         if x = 0 then
             newstr = newstr + Mid(basestr, i)
             exit while
-        endif
+        end if
 
         if x > i then
             newstr = newstr + Mid(basestr, i, x-i)
             i = x
-        endif
+        end if
 
         newstr = newstr + newsub
         i = i + Len(oldsub)
@@ -323,7 +323,7 @@ Function GetXMLElementsByName(xml As Object, name As String) As Object
     for each e in xml.GetBody()
         if e.GetName() = name then
             list.Push(e)
-        endif
+        end if
     next
 
     return list
@@ -343,7 +343,7 @@ Function GetXMLElementBodiesByName(xml As Object, name As String) As Object
         if e.GetName() = name then
             b = e.GetBody()
             if type(b) = "roString" list.Push(b)
-        endif
+        end if
     next
 
     return list
@@ -436,7 +436,7 @@ Sub GetXMLintoAA(xml As Object, aa As Object)
             name = e.GetName()
             name = strReplace(name, ":", "_")
             aa.AddReplace(name, body)
-        endif
+        end if
     next
 End Sub
 
@@ -458,8 +458,8 @@ Sub PrintAA(aa as Object)
         next
         if cnt = 0
             PrintAny(0, "Nothing from for each. Looks like :", aa)
-        endif
-    endif
+        end if
+    end if
     print "------------"
 End Sub
 
@@ -504,24 +504,24 @@ Sub PrintAny(depth As Integer, prefix As String, any As Dynamic)
     if depth >= 10
         print "**** TOO DEEP " + itostr(5)
         return
-    endif
+    end if
     prefix = string(depth*2," ") + prefix
     depth = depth + 1
     str = AnyToString(any)
     if str <> invalid
         print prefix + str
         return
-    endif
+    end if
     if type(any) = "roAssociativeArray"
         print prefix + "(assocarr)..."
         PrintAnyAA(depth, any)
         return
-    endif
+    end if
     if islist(any) = true
         print prefix + "(list of " + itostr(any.Count()) + ")..."
         PrintAnyList(depth, any)
         return
-    endif
+    end if
 
     print prefix + "?" + type(any) + "?"
 End Sub
@@ -539,7 +539,7 @@ Sub Dbg(pre As Dynamic, o=invalid As Dynamic)
     if s = invalid s = "???: " + type(o)
     if Len(s) > 4000
         s = Left(s, 4000)
-    endif
+    end if
     print p + s
 End Sub
 
@@ -591,7 +591,7 @@ Function AnyToString(any As Dynamic) As dynamic
     if isbool(any)
         if any = true return "true"
         return "false"
-    endif
+    end if
     if isfloat(any) return Str(any)
     if type(any) = "roTimespan" return itostr(any.TotalMilliseconds()) + "ms"
     return invalid
@@ -610,7 +610,7 @@ Sub PrintXML(element As Object, depth As Integer)
             if element.GetAttributes().IsNext() then print ", ";
         next
         print
-    endif
+    end if
 
     if element.GetBody()=invalid then
         ' print tab(depth*3);"No Body"
@@ -621,7 +621,7 @@ Sub PrintXML(element As Object, depth As Integer)
         for each e in element.GetBody()
             PrintXML(e, depth+1)
         next
-    endif
+    end if
     print
 end sub
 
@@ -651,13 +651,13 @@ End Sub
 Function validateParam(param As Object, paramType As String,functionName As String, allowInvalid = false) As Boolean
     if type(param) = paramType then
         return true
-    endif
+    end if
 
     if allowInvalid = true then
         if type(param) = invalid then
             return true
-        endif
-    endif
+        end if
+    end if
 
     print "invalid parameter of type "; type(param); " for "; paramType; " in function "; functionName
     return false

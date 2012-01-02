@@ -27,7 +27,7 @@ Function ConstructRokuVideoMetadata(server, sourceUrl, xmlContainer, videoItemXm
 	if video.ContentType = invalid then
 		'* treat video items with no content type as clips
 		video.ContentType = "clip" 
-	endif
+	end if
 	video.Title = videoItemXml@title
 	video.Key = videoItemXml@key
 	
@@ -50,7 +50,7 @@ Function ConstructRokuVideoMetadata(server, sourceUrl, xmlContainer, videoItemXm
 	if length <> invalid then
 		video.Length = int(val(length)/1000)
 		video.RawLength = val(length)
-	endif
+	end if
 	
 	if video.viewCount <> invalid AND val(video.viewCount) > 0 then
 		video.Watched = true
@@ -89,16 +89,16 @@ Function ConstructRokuVideoMetadata(server, sourceUrl, xmlContainer, videoItemXm
 		if video.ReleaseDate <> invalid then
 			video.ShortDescriptionLine2 = video.ShortDescriptionLine2 + " - " + video.ReleaseDate
 		end if
-	endif
+	end if
 	if xmlContainer@viewGroup = "Details" OR xmlContainer@viewGroup = "InfoList" then
 		video.ShortDescriptionLine2 = videoItemXml@summary
-	endif
+	end if
 	if detailed then
 		video.Rating = videoItemXml@contentRating
 		rating = videoItemXml@rating
 		if rating <> invalid then
 			video.StarRating = int(val(rating)*10)
-		endif
+		end if
 		video.Actors = CreateObject("roArray", 15, true)
 		for each Actor in videoItemXml.Role
 			video.Actors.Push(Actor@tag)
@@ -119,18 +119,18 @@ Function ConstructRokuVideoMetadata(server, sourceUrl, xmlContainer, videoItemXm
 			'if videoResolution = "1080" OR videoResolution = "720" then
 			'	video.IsHD = true
 			'	video.HDBranded = true
-			'endif
+			'end if
 			'if videoResolution = "1080" then
 			'	video.FullHD = true
-			'endif
+			'end if
 			frameRate = MediaItem@videoFrameRate
 			if frameRate <> invalid then
 				if frameRate = "24p" then
 					video.FrameRate = 24
 				else if frameRate = "NTSC"
 					video.FrameRate = 30
-				endif
-			endif
+				end if
+			end if
 		next
 	end if
 	sizes = ImageSizes(xmlContainer@viewGroup, video.ContentType)
@@ -142,12 +142,12 @@ Function ConstructRokuVideoMetadata(server, sourceUrl, xmlContainer, videoItemXm
 		art = videoItemXml@art
 		if art = invalid then
 			art = xmlContainer@art
-		endif
+		end if
 		if art <> invalid then
 			video.SDPosterURL = server.TranscodedImage(sourceUrl, art, sizes.sdWidth, sizes.sdHeight)
 			video.HDPosterURL = server.TranscodedImage(sourceUrl, art, sizes.hdWidth, sizes.hdHeight)	
-		endif
-	endif
+		end if
+	end if
 	return video
 End Function
 
@@ -196,6 +196,6 @@ Function PickMediaItem(mediaItems) As Object
 		return mediaItems[0]
 	else
 		return mediaItems[0]
-	endif
+	end if
 End Function
 
