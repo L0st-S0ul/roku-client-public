@@ -255,13 +255,13 @@ Function listNames(parsedXml) As Object
 		'content.Push("Audio")
 		'content.Push("Photo")
 	else
-		'sectionViewGroup = parsedXml.xml@viewGroup
-		'if sectionViewGroup = "secondary" then
+		sectionViewGroup = parsedXml.xml@viewGroup
+		if sectionViewGroup = "secondary" then
 			sections = m.GetContent(parsedXml)
 			for each section in sections
 				content.Push(section.title)
 			next
-		'end if
+		end if
 	end if
 	return content
 End Function
@@ -274,13 +274,13 @@ Function listKeys(parsedXml) As Object
 		'content.Push("/music")
 		'content.Push("/photos")
 	else
-		'sectionViewGroup = parsedXml.xml@viewGroup
-		'if sectionViewGroup = "secondary" then
+		sectionViewGroup = parsedXml.xml@viewGroup
+		if sectionViewGroup = "secondary" then
 			sections = m.GetContent(parsedXml)
 			for each section in sections
 				content.Push(section.key)
 			next
-		'end if
+		end if
 	end if
 	return content
 End Function

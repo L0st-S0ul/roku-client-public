@@ -57,10 +57,12 @@ Function showGridScreen(grid, content) As Integer
 	contentArray = []
 	
 	rowCount = 0	
+	
 	' Load the first grid row...
 	performanceTimer.Mark()
 	rowCount = loadNextRow(grid, server, keys[rowCount], queryResponse.sourceUrl, contentArray, rowCount)
 	Print "ROW LOADER -- First row took: " + itostr(performanceTimer.TotalMilliseconds())
+	
 	' Load the second grid row...
 	'performanceTimer.Mark()
 	'rowCount = loadNextRow(grid, server, keys[rowCount], queryResponse.sourceUrl, contentArray, rowCount)	
