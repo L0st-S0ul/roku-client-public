@@ -484,6 +484,7 @@ End Function
 Function TranscodingVideoUrl(serverUrl As String, videoUrl As String, sourceUrl As String, ratingKey As String, key As String, httpCookies As String, userAgent As String) As String
     print "Constructing transcoding video URL for "+videoUrl
     location = ResolveUrl(serverUrl, sourceUrl, videoUrl)
+    location = ConvertTranscodeURLToLoopback(location)
     print "Location:";location
     if len(key) = 0 then
     	fullKey = ""
@@ -521,6 +522,20 @@ Function TranscodingVideoUrl(serverUrl As String, videoUrl As String, sourceUrl 
     return finalUrl
 End Function
 
+Function ConvertTranscodeURLToLoopback(url) As String
+    'first, if the URL doesn't include ":32400", return it as-is
+    if instr(1, url, ":32400") = 0 then
+        return url
+    end if
+    'second, strip off the http://
+    url = strReplace(url, "http://", "")
+    'then tokenize on the :
+    tokens = strTokenize(url, ":")
+    'print "tokens[0] = ";tokens[0]
+    'print "tokens[1] = ";tokens[1]
+    url = "http://127.0.0.1:"+tokens[1]
+    return url
+End Function
 
 Function Capabilities() As String
 	protocols = "protocols=http-live-streaming,http-mp4-streaming,http-mp4-video,http-mp4-video-720p,http-streaming-video,http-streaming-video-720p"
@@ -529,15 +544,31 @@ Function Capabilities() As String
 	device = CreateObject("roDeviceInfo")
 	audio = "aac"
 	version = device.GetVersion()
-    	major = Mid(version, 3, 1)
-    	minor = Mid(version, 5, 2)
-    	build = Mid(version, 8, 5)
+   	major = Mid(version, 3, 1)
+   	minor = Mid(version, 5, 2)
+   	build = Mid(version, 8, 5)
 	print "Device Version:" + major +"." + minor +" build "+build
+
 	if device.HasFeature("5.1_surround_sound") and major.ToInt() >= 4 then
-		audio="ac3"
+        if not(RegExists("fivepointone", "preferences")) then
+            RegWrite("fivepointone", "1", "preferences")
+        end if
+        fiveone = RegRead("fivepointone", "preferences")
+        print "5.1 support set to: ";fiveone
+        
+        if fiveone <> "2" then
+		    audio="ac3"
+        else
+            print "5.1 support disabled via Tweaks"
+        end if
 	end if 
 	decoders = "videoDecoders=h264{profile:high&resolution:1080&level:"+ RegRead("level", "preferences") + "};audioDecoders="+audio
-	return protocols+";"+decoders
+	'anamorphic video causes problems, disable support for it
+	anamorphic = "playsAnamorphic=no"
+
+	capaString = protocols+";"+decoders+";"+anamorphic
+	print "Capabilities: "+capaString
+	return capaString
 End Function
 
 '*
