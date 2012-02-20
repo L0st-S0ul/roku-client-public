@@ -131,14 +131,12 @@ Function Preferences(homeScreen)
     				homeScreen.Close()
     				screen=preShowHomeScreen("", "")
     				showHomeScreen(screen, PlexMediaServers())
-
 				else if msg.getIndex() = 2 then
         			ConfigureQuality()
 				else if msg.getIndex() = 3 then
         			Tweaks(homeScreen)
-        			else if msg.getIndex() = 4 then
+        		else if msg.getIndex() = 4 then
         			dialog.close()
-
         		end if
 			end if 
 		end if
@@ -146,7 +144,6 @@ Function Preferences(homeScreen)
 End Function
 
 Function Tweaks(homeScreen)
-
 	port = CreateObject("roMessagePort") 
 	dialog = CreateObject("roMessageDialog") 
 	dialog.SetMessagePort(port)
@@ -166,6 +163,7 @@ Function Tweaks(homeScreen)
 				dialog.close()
 				exit while
 			else if msg.isButtonPressed() then
+                print "Button pressed:: msg.getIndex() = ";msg.getIndex()
 				if msg.getIndex() = 1 then
         			H264Level()
 				else if msg.getIndex() = 2 then
@@ -174,7 +172,7 @@ Function Tweaks(homeScreen)
                     FivePointOneSupport()
 				'else if msg.getIndex() = 4 then
         			'SRTSubtitles()
-        		else if msg.getIndex() = 4 then
+        		else if msg.getIndex() = 5 then
         			dialog.close()
         		end if
 			end if 
