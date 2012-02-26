@@ -328,8 +328,17 @@ Function constructPluginVideoScreen(metadata) As Object
     	if mediaItem.indirect then
 			mediaKeyXml = IndirectMediaXml(m, mediaKey)
 			mediaKey = mediaKeyXml.Video.Media.Part[0]@key
-			httpCookies = mediaKeyXml@httpCookies
-			videoclip = ConstructVideoClip(m.serverUrl, mediaKey, sourceUrl, "", "", metadata.title, httpCookies, "")
+            if mediaKeyXml@httpCookies <> invalid then
+			    httpCookies = mediaKeyXml@httpCookies
+            else
+                httpCookies = ""
+            end if
+            if mediaKeyXml@userAgent <> invalid then
+			    userAgent = mediaKeyXml@userAgent
+            else
+                userAgent = ""
+            end if
+			videoclip = ConstructVideoClip(m.serverUrl, mediaKey, sourceUrl, "", "", metadata.title, httpCookies, userAgent)
 		else
 			videoclip = ConstructVideoClip(m.serverUrl, mediaKey, sourceUrl, "", "", metadata.title, "", "")
     	end if
@@ -379,13 +388,13 @@ End Function
 '* source URL, and absolute URLs, so
 '* relative to the server URL
 Function FullUrl(serverUrl, sourceUrl, key) As String
-	'print "Full URL"
+    'print "Full URL"
     'print "ServerURL:";serverUrl
     'print "SourceURL:";sourceUrl
     'print "Key:";key
-	finalUrl = ""
-	if left(key, 4) = "http" then
-		return key
+    finalUrl = ""
+    if left(key, 4) = "http" then
+        return key
     else if left(key, 4) = "plex" then
         url_start = Instr(1, key, "url=") + 4
         url_end = Instr(url_start, key, "&")
@@ -404,36 +413,36 @@ Function FullUrl(serverUrl, sourceUrl, key) As String
 			sourceUrlTokens = strTokenize(sourceUrl, "?")
 		else
 			sourceUrlTokens.Push("")
-		end if
+		endif
 	
-		if keyTokens[0] = "" AND sourceUrlTokens[0] = "" then
-	    	finalUrl = serverUrl
+        if keyTokens[0] = "" AND sourceUrlTokens[0] = "" then
+            finalUrl = serverUrl
     	else if keyTokens[0] = "" AND serverUrl = "" then
-        	finalUrl = sourceUrlTokens[0]
-		else if keyTokens[0] <> invalid AND left(keyTokens[0], 1) = "/" then
-			finalUrl = serverUrl+keyTokens[0]
-		else
+            finalUrl = sourceUrlTokens[0]
+        else if keyTokens[0] <> invalid AND left(keyTokens[0], 1) = "/" then
+            finalUrl = serverUrl+keyTokens[0]
+        else
             if keyTokens[0] <> invalid then
-			    finalUrl = sourceUrlTokens[0]+"/"+keyTokens[0]
+                finalUrl = sourceUrlTokens[0]+"/"+keyTokens[0]
             else
                 finalUrl = sourceUrlTokens[0]+"/"
-            end if
-		end if
-		if keyTokens.Count() = 2 OR sourceUrlTokens.Count() =2 then
-	    	finalUrl = finalUrl + "?"
-	    	if keyTokens.Count() = 2 then
-	    		finalUrl = finalUrl + keyTokens[1]
-	    		if sourceUrlTokens.Count() = 2 then
-	    			finalUrl = finalUrl + "&"
-	    		end if
-	    	end if
-	    	if sourceUrlTokens.Count() = 2 then
-	    		finalUrl = finalUrl + sourceUrlTokens[1]
-	    	end if
-		end if
-    end if
+            endif
+        endif
+        if keyTokens.Count() = 2 then 'OR sourceUrlTokens.Count() =2 then
+            finalUrl = finalUrl + "?"
+            if keyTokens.Count() = 2 then
+                finalUrl = finalUrl + keyTokens[1]
+                'if sourceUrlTokens.Count() = 2 then
+                    'finalUrl = finalUrl + "&"
+                'endif
+            endif
+            'if sourceUrlTokens.Count() = 2 then
+                'finalUrl = finalUrl + sourceUrlTokens[1]
+            'endif
+        endif
+    endif
     'print "FinalURL:";finalUrl
-	return finalUrl
+    return finalUrl
 End Function
 
 Function ResolveUrl(serverUrl As String, sourceUrl As String, uri As String) As String
@@ -483,6 +492,9 @@ End Function
 '*
 Function TranscodingVideoUrl(serverUrl As String, videoUrl As String, sourceUrl As String, ratingKey As String, key As String, httpCookies As String, userAgent As String) As String
     print "Constructing transcoding video URL for "+videoUrl
+    if userAgent <> invalid then
+        print "User Agent: ";userAgent
+    end if
     location = ResolveUrl(serverUrl, sourceUrl, videoUrl)
     location = ConvertTranscodeURLToLoopback(location)
     print "Location:";location
@@ -569,16 +581,16 @@ Function Capabilities() As String
         print "5.1 support set to: ";fiveone
         
         if fiveone <> "2" then
-		    audio="ac3"
+		    audio="ac3{channels:6}"
         else
             print "5.1 support disabled via Tweaks"
         end if
 	end if 
 	decoders = "videoDecoders=h264{profile:high&resolution:1080&level:"+ RegRead("level", "preferences") + "};audioDecoders="+audio
 	'anamorphic video causes problems, disable support for it
-	anamorphic = "playsAnamorphic=no"
+	'anamorphic = "playsAnamorphic=no"
 
-	capaString = protocols+";"+decoders+";"+anamorphic
+	capaString = protocols+";"+decoders '+";"+anamorphic
 	print "Capabilities: "+capaString
 	return capaString
 End Function
