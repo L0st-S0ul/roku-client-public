@@ -15,8 +15,9 @@ Function preShowHomeScreen(breadA=invalid, breadB=invalid) As Object
         screen.SetBreadcrumbText(breadA, breadB)
     end if
 
-    screen.SetListStyle("flat-category")
-    screen.setListDisplayMode("zoom-to-fill")
+    screen.SetListStyle("arced-16x9")
+    screen.setListDisplayMode("photo-fit")
+	
     return screen
 
 End Function
@@ -46,10 +47,9 @@ Function showHomeScreen(screen, servers) As Integer
 	prefs.Key = "prefs"
 	prefs.Title = "Preferences"
 	prefs.ShortDescriptionLine1 = "Preferences"
-	prefs.SDPosterURL = "file://pkg:/images/prefs.jpg"
-	prefs.HDPosterURL = "file://pkg:/images/prefs.jpg"
+	prefs.SDPosterURL = "file://pkg:/images/settings.png"
+	prefs.HDPosterURL = "file://pkg:/images/settings.png"
 	sectionList.Push(prefs)
-	
 	
     screen.SetContentList(sectionList)
     screen.Show()
