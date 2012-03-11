@@ -4,24 +4,20 @@
 ' ********************************************************************
 
 Sub Main()
-	' Development statements
-	' RemoveAllServers()
-	' AddServer("iMac", "http://192.168.1.3:32400")
     screenFacade = CreateObject("roPosterScreen")
     screenFacade.show()
-    'initialize theme attributes like titles, logos and overhang color
+
     initTheme()
 
-    'prepare the screen for display and get ready to begin
     screen=preShowHomeScreen("", "")
     if screen=invalid then
         print "unexpected error in preShowHomeScreen"
         return
     end if
+	
     servers = PlexMediaServers()
     showHomeScreen(screen, servers)
 End Sub
-
 
 '*************************************************************
 '** Set the configurable theme attributes for the application
@@ -35,15 +31,23 @@ Sub initTheme()
     app = CreateObject("roAppManager")
     theme = CreateObject("roAssociativeArray")
 
-    theme.OverhangOffsetSD_X = "72"
-    theme.OverhangOffsetSD_Y = "31"
-    theme.OverhangSliceSD = "pkg:/images/Background_SD.jpg"
-    theme.OverhangLogoSD  = "pkg:/images/logo_final_SD.png"
+	theme.BackgroundColor = "#363636"
+	theme.ButtonMenuNormalText = "#74777A"
+	
+	theme.GridScreenBackgroundColor = "#363636"
+	
+	theme.SpringboardTitleText = "#AAAEB3"
+	theme.SpringboardArtistColor = "#74777A"
+	theme.SpringboardAlbumColor = "#74777A"
+	theme.SpringboardRuntimeColor = "#74777A"
+	
+    theme.OverhangOffsetSD_X = "0"
+    theme.OverhangOffsetSD_Y = "0"
+    theme.OverhangSliceSD = "pkg:/images/Screen_SD.png"
 
-    theme.OverhangOffsetHD_X = "125"
-    theme.OverhangOffsetHD_Y = "35"
-    theme.OverhangSliceHD = "pkg:/images/Background_HD.jpg"
-    theme.OverhangLogoHD  = "pkg:/images/logo_final_HD.png"
+    theme.OverhangOffsetHD_X = "0"
+    theme.OverhangOffsetHD_Y = "0"
+    theme.OverhangSliceHD = "pkg:/images/Screen_HD.png"
 
 	theme.GridScreenLogoHD          = "pkg:/images/GridScreen_HD.png"
     theme.GridScreenLogoOffsetHD_X  = "0"
